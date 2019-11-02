@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.css">
+						
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" >
+	
+        <link rel="stylesheet" href="css/qgis2web.css">
+		<link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+		<link rel="stylesheet" href="css/logocontainer.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        
+		
+		
+		<script src="js/logocontainer.js"></script>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw-src.js"> </script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet.wms.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="data/FaserLakeCommunityForest_2.js"></script>
+        <script src="data/ActiveCutblock_3.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        }).fitBounds([[53.63495495762793,-125.10837804407353],[54.074634833407025,-124.3346612686192]]);
+        var hash = new L.Hash(map);
+         map.attributionControl.setPrefix('<a href="https://sites.google.com/xyintel.com/main/home" target="_blank"> [qgis2web; Leaflet]</a> &middot; ');
+		 
+		           
+		//add scale bar to map
+		L.control.scale({
+            position: 'bottomleft'
+        }).addTo(map)
+		
+		
+		L.Control.Watermark = L.Control.extend({
+			onAdd: function(map) {
+			var img = L.DomUtil.create('img');
+
+				img.src = 'logo_fraser_lake.png';
+				img.style.width = '180px';
+
+				return img;
+				},
+
+			onRemove: function(map) {
+				// Nothing to do here
+			}
+		});
+
+		L.control.watermark = function(opts) {
+			return new L.Control.Watermark(opts);
+			}
+
+		L.control.watermark({ position: 'topright' }).addTo(map);
+		
+		
+		L.Control.Watermark = L.Control.extend({
+			onAdd: function(map) {
+			var img = L.DomUtil.create('img');
+
+				img.src = 'logo28b.png';
+				img.style.width = '120px';
+
+				return img;
+				},
+
+			onRemove: function(map) {
+				// Nothing to do here
+			}
+		});
+
+		L.control.watermark = function(opts) {
+			return new L.Control.Watermark(opts);
+			}
+
+		L.control.watermark({ position: 'bottomright' }).addTo(map);
+		
+		
+        
+		var drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
+
+        var drawControl = new L.Control.Draw({
+            edit: {
+                featureGroup: drawnItems
+            }
+        });
+        map.addControl(drawControl);
+
+        map.on('draw:created', function (e) {
+            var type = e.layerType,
+                layer = e.layer;
+            drawnItems.addLayer(layer);
+        });
+		
+		
+		
+		
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        var layer_GoogleImagery_0 = L.tileLayer('http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}', {
+            opacity: 1.0,
+            attribution: '<a href="https://www.google.com/intl/zh-CN_cn/permissions/geoguidelines/attr-guide.html">地图数据 ©2016 Google</a>',
+        });
+        layer_GoogleImagery_0;
+        var layer_SPOTOrthoImagery_1 = L.WMS.layer("http://geocloud.blackbridge.com/wms_flnro/WCSB_FLNRO.cgi", "British Columbia", {
+            format: 'image/png',
+            uppercase: true,
+            transparent: true,
+            continuousWorld : true,
+            tiled: true,
+            info_format: 'text/html',
+            opacity: 1,
+            identify: false,
+            attribution: '',
+        });
+        map.addLayer(layer_SPOTOrthoImagery_1);
+        function pop_FaserLakeCommunityForest_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DMNDSTRCTC'] !== null ? Autolinker.link(String(feature.properties['DMNDSTRCTC'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FRSTFLD'] !== null ? Autolinker.link(String(feature.properties['FRSTFLD'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FLSTTSCD'] !== null ? Autolinker.link(String(feature.properties['FLSTTSCD'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CLNTNM'] !== null ? Autolinker.link(String(feature.properties['CLNTNM'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FTRCLSSSK'] !== null ? Autolinker.link(String(feature.properties['FTRCLSSSK'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LFCCLSTTSC'] !== null ? Autolinker.link(String(feature.properties['LFCCLSTTSC'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MLTPCD'] !== null ? Autolinker.link(String(feature.properties['MLTPCD'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FTRPRMTR'] !== null ? Autolinker.link(String(feature.properties['FTRPRMTR'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FTRR'] !== null ? Autolinker.link(String(feature.properties['FTRR'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MPBLCKD'] !== null ? Autolinker.link(String(feature.properties['MPBLCKD'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MAP_LABEL'] !== null ? Autolinker.link(String(feature.properties['MAP_LABEL'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ML_COMMENT'] !== null ? Autolinker.link(String(feature.properties['ML_COMMENT'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CLNTNMBR'] !== null ? Autolinker.link(String(feature.properties['CLNTNMBR'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MNDMNTD'] !== null ? Autolinker.link(String(feature.properties['MNDMNTD'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DMNDSTRCTN'] !== null ? Autolinker.link(String(feature.properties['DMNDSTRCTN'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['OBJECTID'] !== null ? Autolinker.link(String(feature.properties['OBJECTID'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['RTRMNTDT'] !== null ? Autolinker.link(String(feature.properties['RTRMNTDT'])) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_FaserLakeCommunityForest_2_0() {
+            return {
+                pane: 'pane_FaserLakeCommunityForest_2',
+                opacity: 1,
+                color: 'rgba(255,1,247,1.0)',
+                dashArray: '1,5',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 4.0,
+                fillOpacity: 0,
+            }
+        }
+        map.createPane('pane_FaserLakeCommunityForest_2');
+        map.getPane('pane_FaserLakeCommunityForest_2').style.zIndex = 402;
+        map.getPane('pane_FaserLakeCommunityForest_2').style['mix-blend-mode'] = 'normal';
+        var layer_FaserLakeCommunityForest_2 = new L.geoJson(json_FaserLakeCommunityForest_2, {
+            attribution: '',
+            pane: 'pane_FaserLakeCommunityForest_2',
+            onEachFeature: pop_FaserLakeCommunityForest_2,
+            style: style_FaserLakeCommunityForest_2_0,
+        });
+        bounds_group.addLayer(layer_FaserLakeCommunityForest_2);
+        map.addLayer(layer_FaserLakeCommunityForest_2);
+        function pop_ActiveCutblock_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CTBLCKFRST'] !== null ? Autolinker.link(String(feature.properties['CTBLCKFRST'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TIMBER_MRK'] !== null ? Autolinker.link(String(feature.properties['TIMBER_MRK'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CUT_BLK_ID'] !== null ? Autolinker.link(String(feature.properties['CUT_BLK_ID'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FEAT_CLASS'] !== null ? Autolinker.link(String(feature.properties['FEAT_CLASS'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BLK_ST_CD'] !== null ? Autolinker.link(String(feature.properties['BLK_ST_CD'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BLK_ST_DT'] !== null ? Autolinker.link(String(feature.properties['BLK_ST_DT'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CB_DESC'] !== null ? Autolinker.link(String(feature.properties['CB_DESC'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CB_SKEY'] !== null ? Autolinker.link(String(feature.properties['CB_SKEY'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CUT_REG_CD'] !== null ? Autolinker.link(String(feature.properties['CUT_REG_CD'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['REFORST_CD'] !== null ? Autolinker.link(String(feature.properties['REFORST_CD'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FEAT_PERIM'] !== null ? Autolinker.link(String(feature.properties['FEAT_PERIM'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['PLN_HRV_DT'] !== null ? Autolinker.link(String(feature.properties['PLN_HRV_DT'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['PLN_GRS_AR'] !== null ? Autolinker.link(String(feature.properties['PLN_GRS_AR'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['PLN_NET_AR'] !== null ? Autolinker.link(String(feature.properties['PLN_NET_AR'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['OPENING_ID'] !== null ? Autolinker.link(String(feature.properties['OPENING_ID'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DSTRBNCSTR'] !== null ? Autolinker.link(String(feature.properties['DSTRBNCSTR'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DSTRBNCNDD'] !== null ? Autolinker.link(String(feature.properties['DSTRBNCNDD'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CLIENT_NUM'] !== null ? Autolinker.link(String(feature.properties['CLIENT_NUM'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CL_LOC_CD'] !== null ? Autolinker.link(String(feature.properties['CL_LOC_CD'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CLIENT_NM'] !== null ? Autolinker.link(String(feature.properties['CLIENT_NM'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['HRV_SKEY'] !== null ? Autolinker.link(String(feature.properties['HRV_SKEY'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['HRVSTTHCTT'] !== null ? Autolinker.link(String(feature.properties['HRVSTTHCTT'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['HRVSTTHFRS'] !== null ? Autolinker.link(String(feature.properties['HRVSTTHFRS'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ADM_DST_CD'] !== null ? Autolinker.link(String(feature.properties['ADM_DST_CD'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ADM_DST_NM'] !== null ? Autolinker.link(String(feature.properties['ADM_DST_NM'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['GEO_DST_CD'] !== null ? Autolinker.link(String(feature.properties['GEO_DST_CD'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['GEO_DST_NM'] !== null ? Autolinker.link(String(feature.properties['GEO_DST_NM'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['HVA_ST_CD'] !== null ? Autolinker.link(String(feature.properties['HVA_ST_CD'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['RETIRE_DT'] !== null ? Autolinker.link(String(feature.properties['RETIRE_DT'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LIFE_ST_CD'] !== null ? Autolinker.link(String(feature.properties['LIFE_ST_CD'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SPXMPTND'] !== null ? Autolinker.link(String(feature.properties['SPXMPTND'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MAP_LABEL'] !== null ? Autolinker.link(String(feature.properties['MAP_LABEL'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FEAT_AREA'] !== null ? Autolinker.link(String(feature.properties['FEAT_AREA'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FEAT_LEN'] !== null ? Autolinker.link(String(feature.properties['FEAT_LEN'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['OBJECTID'] !== null ? Autolinker.link(String(feature.properties['OBJECTID'])) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_ActiveCutblock_3_0() {
+            return {
+                pane: 'pane_ActiveCutblock_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 4.0,
+                fillOpacity: 0,
+            }
+        }
+        map.createPane('pane_ActiveCutblock_3');
+        map.getPane('pane_ActiveCutblock_3').style.zIndex = 403;
+        map.getPane('pane_ActiveCutblock_3').style['mix-blend-mode'] = 'normal';
+        var layer_ActiveCutblock_3 = new L.geoJson(json_ActiveCutblock_3, {
+            attribution: '',
+            pane: 'pane_ActiveCutblock_3',
+            onEachFeature: pop_ActiveCutblock_3,
+            style: style_ActiveCutblock_3_0,
+        });
+        bounds_group.addLayer(layer_ActiveCutblock_3);
+        map.addLayer(layer_ActiveCutblock_3);
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'<img src="legend/ActiveCutblock_3.png" /> Active Cutblock': layer_ActiveCutblock_3,'<img src="legend/FaserLakeCommunityForest_2.png" /> Faser Lake Community Forest': layer_FaserLakeCommunityForest_2,"SPOT OrthoImagery": layer_SPOTOrthoImagery_1,"Google Imagery": layer_GoogleImagery_0,},{collapsed:false}).addTo(map);
+        setBounds();
+        </script>
+    </body>
+</html>
